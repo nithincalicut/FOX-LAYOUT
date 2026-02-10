@@ -344,10 +344,27 @@ const App: React.FC = () => {
   const createCustomFrame = (imageUrl: string, targetSize?: FrameSize | 'custom' | null) => {
       const img = new Image();
       img.onload = () => {
-          let wCm = 25, hCm = 25, size = FrameSize.S20x20;
-          if (targetSize === FrameSize.S20x20) { wCm = 20; hCm = 20; size = FrameSize.S20x20; }
-          else if (targetSize === FrameSize.S20x30) { wCm = 20; hCm = 30; size = FrameSize.S20x30; }
-          else { wCm = 25; hCm = 25 / (img.naturalWidth / img.naturalHeight); }
+          let wCm = 20, hCm = 20, size = FrameSize.S20x20;
+          
+          if (targetSize === FrameSize.S20x20) { 
+              wCm = 20; hCm = 20; size = FrameSize.S20x20; 
+          } else if (targetSize === FrameSize.S20x30) { 
+              wCm = 20; hCm = 30; size = FrameSize.S20x30; 
+          } else {
+              // Auto-detect standard size based on image aspect ratio
+              const ratio = img.naturalWidth / img.naturalHeight;
+              if (ratio > 1.2) {
+                  // Landscape -> 30x20
+                  wCm = 30; hCm = 20; size = FrameSize.S30x20;
+              } else if (ratio < 0.8) {
+                  // Portrait -> 20x30
+                  wCm = 20; hCm = 30; size = FrameSize.S20x30;
+              } else {
+                  // Square-ish -> 20x20
+                  wCm = 20; hCm = 20; size = FrameSize.S20x20;
+              }
+          }
+
           const count = frames.length;
           const newFrame: FrameData = {
               id: `custom-frame-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
